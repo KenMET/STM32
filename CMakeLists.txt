@@ -1,0 +1,91 @@
+cmake_minimum_required(VERSION 3.10)
+
+SET(PRJ_NAME "STM32F1xx")
+project(${PRJ_NAME})
+
+ENABLE_LANGUAGE(ASM)
+
+SET(CMAKE_BUILD_TYPE "Debug")
+
+SET(CMAKE_C_COMPILER arm-none-eabi-gcc)
+SET(CMAKE_OBJCOPY arm-none-eabi-objcopy) 
+SET(CMAKE_SIZE arm-none-eabi-size)
+SET(MCU_FLAGS "-mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16")
+SET(CMAKE_C_FLAGS "${MCU_FLAGS} -w -Wno-unknown-pragmas")
+SET(CMAKE_C_FLAGS_DEBUG "-O0 -g2 -ggdb")
+SET(CMAKE_C_FLAGS_RELEASE "-O3")
+
+ADD_DEFINITIONS(
+	-DSTM32F10X_MD
+	-DUSE_STDPERIPH_DRIVER
+	-DARM_MATH_CM3
+)
+
+
+SET(CORE_SUPPORT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/System/CMSIS/CoreSupport)
+SET(DEVICE_SUPPORT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/System/CMSIS/DeviceSupport)
+SET(START_UP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/System/CMSIS/StartUp)
+SET(FLASH_LD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/System/CMSIS/DeviceSupport/FlashLd)
+SET(FWLIB ${CMAKE_CURRENT_SOURCE_DIR}/System/STM32F10x_StdLib)
+SET(DRIVER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Driver)
+SET(USER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/User)
+SET(FLASH_LD_FILE STM32F103R8Tx_FLASH.ld)
+SET(START_UP_ASM startup_stm32f103xb.s)
+
+INCLUDE_DIRECTORIES(
+	${CORE_SUPPORT_DIR}
+	${DEVICE_SUPPORT_DIR}
+	${USER_DIR}
+	${FWLIB}/inc
+	${DRIVER_DIR}/Delay
+	${DRIVER_DIR}/Usart
+)
+
+set_property(SOURCE ${START_UP_DIR}/${START_UP_ASM} PROPERTY LANGUAGE C)
+
+file(GLOB STD_LIB ${FWLIB}/src/*.c)
+file(GLOB SRC_CORE ${CORE_SUPPORT_DIR}/*.c)
+file(GLOB SRC_DEVICE ${DEVICE_SUPPORT_DIR}/*.c)
+add_library(stm32_lib 
+	${STD_LIB}
+	${SRC_CORE}
+	${SRC_DEVICE}
+	${START_UP_DIR}/${START_UP_ASM}
+)
+
+
+file(GLOB SRC_USER ${USER_DIR}/*.c)
+file(GLOB SRC_DRIVER_DELAY ${DRIVER_DIR}/Delay/*.c)
+file(GLOB SRC_DRIVER_USART ${DRIVER_DIR}/Usart/*.c)
+add_library(${PRJ_NAME}
+	${SRC_USER}
+	${SRC_DRIVER_DELAY}
+	${SRC_DRIVER_USART}
+)
+SET(LINK_LIB m c nosys stm32_lib)
+target_link_libraries(${PRJ_NAME} ${LINK_LIB})
+
+SET(LINKER_SCRIPT ${FLASH_LD_DIR}/${FLASH_LD_FILE})
+SET(CMAKE_EXE_LINKER_FLAGS
+"--specs=nano.specs -specs=nosys.specs -T${LINKER_SCRIPT} -Wl,-Map=${PROJECT_BINARY_DIR}/${PRJ_NAME}.map,--cref -Wl,--gc-sections")
+
+add_executable(${PRJ_NAME}.elf ${USER_DIR}/main.c)
+target_link_libraries(${PRJ_NAME}.elf ${PRJ_NAME})
+
+SET(ELF_FILE ${PROJECT_BINARY_DIR}/${PRJ_NAME}.elf)
+SET(HEX_FILE ${PROJECT_BINARY_DIR}/${PRJ_NAME}.hex)
+SET(BIN_FILE ${PROJECT_BINARY_DIR}/${PRJ_NAME}.bin)
+
+add_custom_command(TARGET "${PRJ_NAME}.elf" POST_BUILD
+    COMMAND ${CMAKE_OBJCOPY} -Obinary ${ELF_FILE} ${BIN_FILE}
+    COMMAND ${CMAKE_OBJCOPY} -Oihex  ${ELF_FILE} ${HEX_FILE}
+    COMMENT "Building ${PRJ_NAME}.bin and ${PRJ_NAME}.hex"
+
+    COMMAND ${CMAKE_COMMAND} -E copy ${HEX_FILE} "${CMAKE_CURRENT_BINARY_DIR}/${PRJ_NAME}.hex"
+    COMMAND ${CMAKE_COMMAND} -E copy ${BIN_FILE} "${CMAKE_CURRENT_BINARY_DIR}/${PRJ_NAME}.bin"
+
+    COMMAND ${CMAKE_SIZE} --format=berkeley ${PRJ_NAME}.elf ${PRJ_NAME}.hex
+    COMMENT "Invoking: Cross ARM GNU Print Size"
+)
+
+

@@ -66,6 +66,7 @@ LR_m_stmflash m_stmflash_start m_stmflash_size {		//LR_m_stmflashº”‘ÿ”Ú
 	lc_ctype_c.o
 	
 	main.o 
+	run.o 
     sys.o 
 	usart.o
 	delay.o 

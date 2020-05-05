@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER, STM32H750xx,SYSTEM_SUPPORT_OS</Define>
               <Undefine></Undefine>
-              <IncludePath>..\System\CMSIS\CoreSupport;..\System\CMSIS\CortexM7-MathLib;..\System\CMSIS\DeviceSupport;..\System\STM32H7xx_StdLib\inc;..\Driver\Delay;..\Driver\LED;..\Driver\Sys;..\Driver\Usart;..\User;..\System\UCOSiii\uC-CPU;..\System\UCOSiii\uC-CPU\ARM-Cortex-M4\RealView;..\System\UCOSiii\uC-LIB;..\System\UCOSiii\UCOS-BSP;..\System\UCOSiii\UCOS-CONFIG;..\System\UCOSiii\uCOS-III\Ports\ARM-Cortex-M4\Generic\RealView;..\System\UCOSiii\uCOS-III\Source</IncludePath>
+              <IncludePath>..\System\CMSIS\CoreSupport;..\System\CMSIS\CortexM7-MathLib;..\System\CMSIS\DeviceSupport;..\System\STM32H7xx_StdLib\inc;..\Driver\LED;..\Driver\Usart;..\User;..\System\UCOSiii\uC-CPU;..\System\UCOSiii\uC-CPU\ARM-Cortex-M4\RealView;..\System\UCOSiii\uC-LIB;..\System\UCOSiii\UCOS-BSP;..\System\UCOSiii\UCOS-CONFIG;..\System\UCOSiii\uCOS-III\Ports\ARM-Cortex-M4\Generic\RealView;..\System\UCOSiii\uCOS-III\Source;..\System\Delay;..\System\Malloc;..\System\Sys</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -411,6 +411,21 @@
               <FileName>system_stm32h7xx.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\System\CMSIS\DeviceSupport\system_stm32h7xx.c</FilePath>
+            </File>
+            <File>
+              <FileName>delay.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\System\Delay\delay.c</FilePath>
+            </File>
+            <File>
+              <FileName>sys.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\System\Sys\sys.c</FilePath>
+            </File>
+            <File>
+              <FileName>malloc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\System\Malloc\malloc.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1043,19 +1058,9 @@
           <GroupName>Driver</GroupName>
           <Files>
             <File>
-              <FileName>delay.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Driver\Delay\delay.c</FilePath>
-            </File>
-            <File>
               <FileName>led.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Driver\LED\led.c</FilePath>
-            </File>
-            <File>
-              <FileName>sys.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Driver\Sys\sys.c</FilePath>
             </File>
             <File>
               <FileName>usart.c</FileName>
